@@ -2,6 +2,7 @@
 
 const express = require("express");
 const mongoose = require("mongoose");
+const encrypt = require("mongoose-encryption");
 
 const app = express();
 app.use(express.static("public"));
@@ -9,11 +10,17 @@ app.use(express.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 
 mongoose.connect("mongodb://localhost:27017/userDB");
-const userSchema = {
+
+const userSchema =  new mongoose.Schema({
     email: String,
     password: String
-};
+}) ;
 
+//encrypting the database passwords of user
+var secret = "Thisisourlittlesecret";
+userSchema.plugin(encrypt, {secret: secret, encryptedFields: ["password"]});
+
+//creating collection using mongoose.model
 const User = new mongoose.model("User", userSchema);
 
 app.get("/", function(req, res){
