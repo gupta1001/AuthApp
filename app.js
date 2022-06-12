@@ -2,7 +2,10 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
+const md5 = require("md5");
+
+//For mongoose encryption
+/*const encrypt = require("mongoose-encryption");*/
 
 const app = express();
 app.use(express.static("public"));
@@ -16,8 +19,8 @@ const userSchema =  new mongoose.Schema({
     password: String
 }) ; 
 
-//encrypting the database passwords of user
-userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"]});
+//encrypting the database passwords of user using mongoose-encryption
+/*userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"]});*/
 
 //creating collection using mongoose.model
 const User = new mongoose.model("User", userSchema);
@@ -37,7 +40,7 @@ app.get("/register", function(req, res){
 app.post("/register", function(req, res) {
     const newUser = new User({
         email: req.body.username,
-        password: req.body.password
+        password: md5(req.body.password)
     });
     newUser.save(function (err) {
         if(err){
@@ -51,7 +54,7 @@ app.post("/register", function(req, res) {
 
 app.post("/login", function (req, res) {
     const userEmail = req.body.username;
-    const userPassword = req.body.password;
+    const userPassword = md5(req.body.password);
     User.findOne({email: userEmail}, function (err, foundUser) {
         if (foundUser === null || foundUser === ""){
             res.redirect("/register")
