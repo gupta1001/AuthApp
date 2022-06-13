@@ -96,14 +96,14 @@ app.post("/register", function(req, res) {
     //         res.render("secrets"); 
     //     }
     // });
-})
+});
 
 app.post("/login", function (req, res) {
     const user = new User({
         email: req.body.username,
         password: req.body.password
     });
-    
+
     req.login(user, function(err) {
         if (err){
             console.log(err);
@@ -131,7 +131,18 @@ app.post("/login", function (req, res) {
     //         // }
     //     }
     // })
-})
+});
+
+app.get('/logout', function(req, res) {
+    req.logout(function(err) {
+        if(err){
+            console.log(err);
+        }
+        else{
+            res.redirect('/'); 
+        }
+    });
+});
 
 
 
