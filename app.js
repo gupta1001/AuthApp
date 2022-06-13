@@ -43,8 +43,13 @@ const User = new mongoose.model("User", userSchema);
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
 
 app.get("/", function(req, res){
     res.render("home");
@@ -98,17 +103,18 @@ app.post("/login", function (req, res) {
         email: req.body.username,
         password: req.body.password
     });
-
+    
     req.login(user, function(err) {
-        if (err) { 
+        if (err){
             console.log(err);
         }
         else{
-            passport.authenticate("local")(req, res, function () {
-                res.redirect("/secrets");
-            });        
+            passport.authenticate('local')(req, res, function() {
+                res.redirect('/secrets');
+            });
         }
-      });
+        
+    });
     //for creating hash using md5 package
     // const userPassword = md5(req.body.password);
     // User.findOne({email: userEmail}, function (err, foundUser) {
